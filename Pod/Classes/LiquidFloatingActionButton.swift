@@ -140,6 +140,8 @@ public class LiquidFloatingActionButton : UIView {
     // close all cells
     public func close() {
         
+        self.delegate?.liquidFloatingActionButtonWillClose?(self)
+        
         // rotate plus icon
         CATransaction.setAnimationDuration(self.closeAnimationDuration)
         self.plusLayer.transform = CATransform3DMakeRotation(0, 0, 0, 1)
