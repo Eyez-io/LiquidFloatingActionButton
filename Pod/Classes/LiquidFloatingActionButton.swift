@@ -17,6 +17,10 @@ import QuartzCore
 
 @objc public protocol LiquidFloatingActionButtonDelegate {
     // selected method
+    optional func liquidFloatingActionButtonWillOpen(liquidFloatingActionButton: LiquidFloatingActionButton)
+    optional func liquidFloatingActionButtonDidOpen(liquidFloatingActionButton: LiquidFloatingActionButton)
+    optional func liquidFloatingActionButtonWillClose(liquidFloatingActionButton: LiquidFloatingActionButton)
+    optional func liquidFloatingActionButtonDidClose(liquidFloatingActionButton: LiquidFloatingActionButton)
     optional func liquidFloatingActionButton(liquidFloatingActionButton: LiquidFloatingActionButton, didSelectItemAtIndex index: Int)
 }
 
@@ -113,6 +117,8 @@ public class LiquidFloatingActionButton : UIView {
     // open all cells
     public func open() {
         
+        self.delegate?.liquidFloatingActionButtonWillOpen?(self)
+        
         // rotate plus icon
         CATransaction.setAnimationDuration(self.openAnimationDuration)
         self.plusLayer.transform = CATransform3DMakeRotation((CGFloat(M_PI) * rotationDegrees) / 180, 0, 0, 1)
@@ -125,6 +131,10 @@ public class LiquidFloatingActionButton : UIView {
         self.baseView.open(cells)
         
         self.isClosed = false
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(self.openAnimationDuration * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+            self.delegate?.liquidFloatingActionButtonDidOpen?(self)
+        }
     }
 
     // close all cells
@@ -137,6 +147,11 @@ public class LiquidFloatingActionButton : UIView {
         self.baseView.close(cellArray())
         
         self.isClosed = true
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (Int64)(self.closeAnimationDuration * Double(NSEC_PER_SEC))), dispatch_get_main_queue()) {
+            self.delegate?.liquidFloatingActionButtonDidOpen?(self)
+        }
+
     }
 
     // MARK: draw icon
